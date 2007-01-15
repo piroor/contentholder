@@ -1,0 +1,164 @@
+<?xml version="1.0"?>
+
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is the Content Holder.
+   -
+   - The Initial Developer of the Original Code is SHIMODA Hiroshi.
+   - Portions created by the Initial Developer are Copyright (C) 2003-2005
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s): SHIMODA Hiroshi <piro@p.club.ne.jp>
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->
+
+<?xml-stylesheet href="chrome://contentholder/content/contentholder.css" type="text/css"?>
+
+<!DOCTYPE bindings SYSTEM "chrome://contentholder/locale/">
+
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<script type="application/x-javascript" src="chrome://global/content/XPCNativeWrapper.js"/>
+<script type="application/x-javascript" src="chrome://contentholder/content/pXPCNativeWrapper.js"/>
+
+<script type="application/x-javascript"><![CDATA[
+var gAppContent;
+
+var contentHolderDNDObserver =
+{
+	onDrop: function (aEvent, aXferData, aDragSession)
+	{
+		aEvent.preventDefault();
+		aEvent.preventBubble();
+
+		// "window.retrieveURLFromData()" is old implementation
+		var url = 'retrieveURLFromData' in window ? retrieveURLFromData(aXferData.data, aXferData.flavour.contentType) : transferUtils.retrieveURLFromData(aXferData.data, aXferData.flavour.contentType) ;
+		if (!url || !url.length || url.indexOf(' ', 0) != -1)
+			return;
+
+		var sourceDoc = aDragSession.sourceDocument;
+		if (sourceDoc) {
+			var sourceURI = sourceDoc.documentURI;
+			const nsIScriptSecurityManager = Components.interfaces.nsIScriptSecurityManager;
+			var secMan = Components.classes['@mozilla.org/scriptsecuritymanager;1'].getService(nsIScriptSecurityManager);
+			try {
+				secMan.checkLoadURIStr(sourceURI, url, nsIScriptSecurityManager.STANDARD);
+			}
+			catch(e) {
+				aEvent.stopPropagation();
+				throw 'Drop of ' + url + ' denied.';
+			}
+		}
+
+		gAppContent.contentHolderLoad(getShortcutOrURI(url));
+	},
+
+	getSupportedFlavours: function ()
+	{
+		var flavourSet = new FlavourSet();
+		flavourSet.appendFlavour('text/x-moz-url');
+		flavourSet.appendFlavour('text/unicode');
+		flavourSet.appendFlavour('application/x-moz-file', 'nsIFile');
+		return flavourSet;
+	}
+};
+
+window.addEventListener('load',
+	function()
+	{
+		gAppContent = document.getElementById('appcontent');
+		if (!gAppContent) return;
+		gAppContent.contentHolderInit();
+		window.addEventListener('unload', gAppContent.contentHolderShutdown, false);
+	},
+	false
+);
+]]></script>
+
+<keyset id="navKeys">
+	<keyset id="mainKeyset"/>
+</keyset>
+
+<keyset id="mainKeyset">
+	<keyset id="keyset_contentholder">
+		<key id="key_contentholder_showHide"
+			keycode="VK_F9"
+			oncommand="gAppContent.contentHolderShowHide();"
+			modifiers="accel"/>
+		<key id="key_contentholder_loadCurrent"
+			keycode="VK_DOWN"
+			oncommand="gAppContent.contentHolderLoad();"
+			modifiers="alt,shift"/>
+		<key id="key_contentholder_browserLoad"
+			keycode="VK_UP"
+			oncommand="gAppContent.contentHolderBrowserLoad();"
+			modifiers="alt,shift"/>
+		<key id="key_contentholder_browserLoadTab"
+			keycode="VK_RIGHT"
+			oncommand="gAppContent.contentHolderBrowserLoad(null, true);"
+			modifiers="alt,shift"/>
+		<key id="key_contentholder_stockMenu"
+			keycode="VK_F9"
+			oncommand="gAppContent.contentHolderShowPopup('contentHolder-stock-shortcut');"
+			modifiers="accel,shift"/>
+	</keyset>
+</keyset>
+
+
+<popup id="contentAreaContextMenu">
+	<menu id="frame">
+		<menupopup id="frame_popup">
+			<menuseparator id="context-contentHolder-frameSep"
+				contentHolderItem="true"/>
+			<menuitem id="context-contentHolder-loadCurrentFrame"
+				contentHolderItem="true"
+				class="menuitem-iconic"
+				image="chrome://contentholder/content/res/in.png"
+				label="&contentholder.loadCurrent.contentFrame.label;"
+				accesskey="&contentholder.loadCurrent.contentFrame.accesskey;"
+				oncommand="gAppContent.contentHolderLoad(Components.lookupMethod(document.popupNode.ownerDocument, 'URL').call(document.popupNode.ownerDocument));"/>
+		</menupopup>
+	</menu>
+
+	<menuseparator id="context-contentHolder-sep"
+		contentHolderItem="true"/>
+	<menuitem id="context-contentHolder-loadCurrent"
+		contentHolderItem="true"
+		class="menuitem-iconic"
+		image="chrome://contentholder/content/res/in.png"
+		label="&contentholder.loadCurrent.content.label;"
+		accesskey="&contentholder.loadCurrent.content.accesskey;"
+		oncommand="gAppContent.contentHolderLoad(gContextMenu.onLink ? ('getLinkURI' in gContextMenu ? gContextMenu.linkURI : gContextMenu.linkURL() ) : null );"/>
+	<menuitem id="context-contentHolder-loadInBrowser"
+		contentHolderItem="true"
+		class="menuitem-iconic"
+		image="chrome://contentholder/content/res/out.png"
+		label="&contentholder.loadInBrowser.content.label;"
+		accesskey="&contentholder.loadInBrowser.content.accesskey;"
+		oncommand="gAppContent.contentHolderBrowserLoad();"/>
+</popup>
+
+</overlay>

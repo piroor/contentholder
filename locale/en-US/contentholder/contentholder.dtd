@@ -1,0 +1,104 @@
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is the Content Holder.
+   -
+   - The Initial Developer of the Original Code is SHIMODA Hiroshi.
+   - Portions created by the Initial Developer are Copyright (C) 2003
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s): SHIMODA Hiroshi <piro@p.club.ne.jp>
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->
+
+<!ENTITY contentholder.loadCurrent.content.label       "Take into Holder">
+<!ENTITY contentholder.loadCurrent.content.accesskey   "T">
+<!ENTITY contentholder.loadCurrent.contentFrame.label       "Take Frame into Holder">
+<!ENTITY contentholder.loadCurrent.contentFrame.accesskey   "T">
+<!ENTITY contentholder.loadInBrowser.content.label     "Load from Holder">
+<!ENTITY contentholder.loadInBrowser.content.accesskey "L">
+
+<!ENTITY contentholder.loadCurrent.label       "Take the Current Page">
+<!ENTITY contentholder.loadCurrent.accesskey   "T">
+<!ENTITY contentholder.loadInBrowser.label     "Load in Main Browser">
+<!ENTITY contentholder.loadInBrowser.accesskey "L">
+<!ENTITY contentholder.loadInTab.label         "Load in New Tab">
+<!ENTITY contentholder.loadInTab.accesskey     "N">
+
+<!ENTITY contentholder.goBack.label            "Back">
+<!ENTITY contentholder.goBack.accesskey        "B">
+<!ENTITY contentholder.goForward.label         "Forward">
+<!ENTITY contentholder.goForward.accesskey     "F">
+<!ENTITY contentholder.reload.label            "Reload">
+<!ENTITY contentholder.reload.accesskey        "R">
+<!ENTITY contentholder.stop.label              "Stop">
+<!ENTITY contentholder.stop.accesskey          "S">
+<!ENTITY contentholder.url.label               "Open URL">
+<!ENTITY contentholder.url.accesskey           "O">
+
+<!ENTITY contentholder.position.label          "Position">
+<!ENTITY contentholder.position.accesskey      "w">
+<!ENTITY contentholder.top.label               "Top">
+<!ENTITY contentholder.top.accesskey           "T">
+<!ENTITY contentholder.bottom.label            "Bottom">
+<!ENTITY contentholder.bottom.accesskey        "B">
+<!ENTITY contentholder.left.label              "Left">
+<!ENTITY contentholder.left.accesskey          "L">
+<!ENTITY contentholder.right.label             "Right">
+<!ENTITY contentholder.right.accesskey         "R">
+
+<!ENTITY contentholder.stockMenu.key             "S">
+<!ENTITY contentholder.stock.label               "Stocked">
+<!ENTITY contentholder.stock.accesskey           "S">
+<!ENTITY contentholder.stock_full.label          "More">
+<!ENTITY contentholder.stock_full.accesskey      "M">
+<!ENTITY contentholder.stock_add.label           "Stock This Page">
+<!ENTITY contentholder.stock_add.accesskey       "T">
+<!ENTITY contentholder.stock_delete.label        "Delete">
+<!ENTITY contentholder.stock_delete.accesskey    "D">
+<!ENTITY contentholder.stock_deleteAll.label     "Delete All">
+<!ENTITY contentholder.stock_deleteAll.accesskey "A">
+
+<!ENTITY contentholder.buttonsShowHide.label     "Show Buttons">
+<!ENTITY contentholder.buttonsShowHide.accesskey "B">
+<!ENTITY contentholder.buttonsSmall.label        "Small Buttons">
+<!ENTITY contentholder.buttonsSmall.accesskey    "l">
+
+<!ENTITY contentholder.about.label       "Version Info">
+<!ENTITY contentholder.about.title       "About Content Holder">
+<!ENTITY contentholder.about.name_before "Content Holder Ver.">
+<!ENTITY contentholder.about.name_after  "">
+<!ENTITY contentholder.about.destributed "http://piro.sakura.ne.jp/">
+<!ENTITY contentholder.about.uninstall   "Uninstall">
+
+<!ENTITY contentholder.OK                "OK">
+
+<!ENTITY contentholder.tooltip  "Content Holder: Drag and drop links, bookmarks and so on, into this area.">
+
+
+
+<!-- for Netscape 7 -->
+<!ENTITY redoCmd.label     "Redo">
+<!ENTITY redoCmd.accesskey "R">

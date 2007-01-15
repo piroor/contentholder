@@ -1,0 +1,1003 @@
+<?xml version="1.0"?>
+
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is the Content Holder.
+   -
+   - The Initial Developer of the Original Code is SHIMODA Hiroshi.
+   - Portions created by the Initial Developer are Copyright (C) 2003-2005
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s): SHIMODA Hiroshi <piro@p.club.ne.jp>
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->
+
+<!DOCTYPE overlay [
+	<!ENTITY % textcontextDTD SYSTEM "chrome://global/locale/textcontext.dtd" >
+	%textcontextDTD;
+	<!ENTITY % mainDTD SYSTEM "chrome://contentholder/locale/" >
+	%mainDTD;
+]>
+
+<bindings id="contentHolderBindings"
+	xmlns="http://www.mozilla.org/xbl"
+	xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	xmlns:xbl="http://www.mozilla.org/xbl">
+
+<binding id="contentHolder" extends="xul:vbox">
+	<content>
+		<xul:box id="contentHolderContainerBox"
+			orient="vertical" flex="1">
+			<xul:box id="mainContentBox" orient="vertical" flex="1">
+				<children/>
+			</xul:box>
+			<xul:splitter id="contentHolder-splitter"
+				class="chromeclass-extrachrome"
+				collapse="after"
+				onmouseup="gAppContent.contentHolderInitContent(); setTimeout('document.getElementById(\'appcontent\').contentHolderSaveState();',100);"
+				ondragdrop="nsDragAndDrop.drop(event, contentHolderDNDObserver);"
+				ondraggesture="this.removeAttribute('state'); this.nextSibling.collapsed = false;"
+				state="collapsed"
+				align="center">
+				<xul:spacer flex="1"
+					tooltip="contentHolderTooltip"/>
+
+				<xul:toolbarbutton
+					tooltiptext="&contentholder.loadCurrent.content.label;"
+					oncommand="gAppContent.contentHolderLoad();"
+					class="contentHolderSplitterButton takeIn"/>
+				<xul:toolbarbutton
+					tooltiptext="&contentholder.loadInBrowser.content.label;"
+					oncommand="gAppContent.contentHolderBrowserLoad();"
+					class="contentHolderSplitterButton takeOut"/>
+
+				<xul:spacer flex="1"
+					tooltip="contentHolderTooltip"/>
+
+				<xul:toolbarbutton
+					tooltiptext="&contentholder.goBack.label;"
+					oncommand="gAppContent.contentHolderGoBack();"
+					class="contentHolderSplitterButton navigations goBack"/>
+				<xul:toolbarbutton
+					tooltiptext="&contentholder.goForward.label;"
+					oncommand="gAppContent.contentHolderGoForward();"
+					class="contentHolderSplitterButton navigations goForward"/>
+				<xul:toolbarbutton
+					tooltiptext="&contentholder.reload.label;"
+					oncommand="gAppContent.contentHolderReload();"
+					class="contentHolderSplitterButton navigations reload"/>
+				<xul:toolbarbutton
+					tooltiptext="&contentholder.stop.label;"
+					oncommand="gAppContent.contentHolderStop();"
+					class="contentHolderSplitterButton navigations stop"/>
+				<xul:toolbarbutton
+					tooltiptext="&contentholder.url.label;"
+					oncommand="gAppContent.contentHolderOpenURL();"
+					class="contentHolderSplitterButton navigations goURL"/>
+
+				<xul:spacer flex="14"
+					tooltip="contentHolderTooltip"/>
+
+				<xul:grippy
+					oncommand="gAppContent.contentHolderOnCollapseOrExpand();"
+					tooltip="contentHolderTooltip"/>
+				<xul:spacer flex="16"
+					tooltip="contentHolderTooltip"/>
+			</xul:splitter>
+			<xul:box id="contentHolderBox" orient="vertical" collapsed="true">
+				<xul:box id="contentHolderInnerBox" orient="horizontal" flex="1">
+					<xul:browser id="contentHolder"
+						flex="1"
+						type="content"
+						tooltip="contentHolderTooltip"
+						onclick="return contentAreaClick(event);"
+						ondragdrop="nsDragAndDrop.drop(event, contentHolderDNDObserver);"
+						content="about:blank"
+						contextmenu="contentAreaContextMenu"
+						contentcontextmenu="contentAreaContextMenu"/>
+				</xul:box>
+				<xul:tooltip id="contentHolderTooltip" label="&contentholder.tooltip;"/>
+			</xul:box>
+		</xul:box>
+		<xul:menupopup id="contentHolderContextMenu"
+			onpopupshowing="event.stopPropagation();"
+			onpopuphiding="event.stopPropagation();">
+			<xul:menuitem
+				class="menuitem-iconic"
+				image="chrome://contentholder/content/res/in.png"
+				label="&contentholder.loadCurrent.label;"
+				accesskey="&contentholder.loadCurrent.accesskey;"
+				oncommand="gAppContent.contentHolderLoad();"/>
+			<xul:menu id="contentHolder-stock"
+				label="&contentholder.stock.label;"
+				accesskey="&contentholder.stock.accesskey;">
+				<xul:menupopup id="contentHolder-stock-mpopup"
+					style="max-width:28em"
+					oncommand="gAppContent.contentHolderLoad(event.originalTarget.value);"
+					onpopupshowing="gAppContent.contentHolderInitStockMenu(this); event.stopPropagation();"
+					onpopuphiding="event.stopPropagation();">
+					<xul:menu class="stock-full"
+						label="&contentholder.stock_full.label;"
+						accesskey="&contentholder.stock_full.accesskey;">
+						<xul:menupopup class="stock-full-popup"
+							onpopupshowing="event.stopPropagation();"
+							onpopuphiding="event.stopPropagation();"/>
+					</xul:menu>
+					<xul:menuseparator class="stock-sep"/>
+					<xul:menuitem class="stock-add"
+						label="&contentholder.stock_add.label;"
+						accesskey="&contentholder.stock_add.accesskey;"
+						oncommand="gAppContent.contentHolderStockCurrent(); event.stopPropagation();"/>
+					<xul:menuseparator/>
+					<xul:menu class="stock-delete"
+						label="&contentholder.stock_delete.label;"
+						accesskey="&contentholder.stock_delete.accesskey;">
+						<xul:menupopup class="stock-delete-popup"
+							style="max-width:28em"
+							oncommand="gAppContent.contentHolderRemoveStock(event.originalTarget.value); event.stopPropagation();"
+							onpopupshowing="event.stopPropagation();"
+							onpopuphiding="event.stopPropagation();"/>
+					</xul:menu>
+					<xul:menuitem class="stock-deleteAll"
+						label="&contentholder.stock_deleteAll.label;"
+						accesskey="&contentholder.stock_deleteAll.accesskey;"
+						oncommand="gAppContent.contentHolderRemoveAllStocks(); event.stopPropagation();"/>
+				</xul:menupopup>
+			</xul:menu>
+			<xul:menuseparator/>
+			<xul:menuitem
+				class="menuitem-iconic"
+				image="chrome://contentholder/content/res/out.png"
+				label="&contentholder.loadInBrowser.label;"
+				accesskey="&contentholder.loadInBrowser.accesskey;"
+				oncommand="gAppContent.contentHolderBrowserLoad();"/>
+			<xul:menuitem
+				label="&contentholder.loadInTab.label;"
+				accesskey="&contentholder.loadInTab.accesskey;"
+				oncommand="gAppContent.contentHolderBrowserLoad(null, true);"/>
+			<xul:menuseparator/>
+			<xul:menuitem id="contentHolder-goBack"
+				label="&contentholder.goBack.label;"
+				accesskey="&contentholder.goBack.accesskey;"
+				oncommand="gAppContent.contentHolderGoBack();"/>
+			<xul:menuitem id="contentHolder-goForward"
+				label="&contentholder.goForward.label;"
+				accesskey="&contentholder.goForward.accesskey;"
+				oncommand="gAppContent.contentHolderGoForward();"/>
+			<xul:menuitem
+				label="&contentholder.reload.label;"
+				accesskey="&contentholder.reload.accesskey;"
+				oncommand="gAppContent.contentHolderReload();"/>
+			<xul:menuitem id="contentHolder-stop"
+				label="&contentholder.stop.label;"
+				accesskey="&contentholder.stop.accesskey;"
+				oncommand="gAppContent.contentHolderStop();"/>
+			<xul:menuitem
+				label="&contentholder.url.label;"
+				accesskey="&contentholder.url.accesskey;"
+				oncommand="gAppContent.contentHolderOpenURL();"/>
+			<xul:menuseparator/>
+			<xul:menuitem id="contentHolder-undo"
+				label="&undoCmd.label;"
+				accesskey="&undoCmd.accesskey;"
+				command="cmd_undo"/>
+			<xul:menuitem id="contentHolder-redo"
+				label="&redoCmd.label;"
+				accesskey="&redoCmd.accesskey;"
+				command="cmd_redo"/>
+			<xul:menuseparator/>
+			<xul:menuitem id="contentHolder-cut"
+				label="&cutCmd.label;"
+				accesskey="&cutCmd.accesskey;"
+				command="cmd_cut"/>
+			<xul:menuitem id="contentHolder-copy"
+				label="&copyCmd.label;"
+				accesskey="&copyCmd.accesskey;"
+				command="cmd_copy"/>
+			<xul:menuitem id="contentHolder-paste"
+				label="&pasteCmd.label;"
+				accesskey="&pasteCmd.accesskey;"
+				command="cmd_paste"/>
+			<xul:menuitem id="contentHolder-delete"
+				label="&deleteCmd.label;"
+				accesskey="&deleteCmd.accesskey;"
+				command="cmd_delete"/>
+			<xul:menuseparator/>
+			<xul:menuitem id="contentHolder-selectAll"
+				label="&selectAllCmd.label;"
+				accesskey="&selectAllCmd.accesskey;"
+				command="cmd_selectAll"/>
+			<xul:menuseparator/>
+			<xul:menu id="contentHolder-position"
+				label="&contentholder.position.label;"
+				accesskey="&contentholder.position.accesskey;">
+				<xul:menupopup id="contentHolder-position-popup"
+					oncommand="gAppContent.contentHolderPosition = String(event.originalTarget.id.match(/\w+$/));"
+					onpopupshowing="document.getElementById('contentHolder-position-'+gAppContent.contentHolderPosition).checked = true; event.stopPropagation();"
+					onpopuphiding="event.stopPropagation();">
+					<xul:menuitem id="contentHolder-position-top"
+						label="&contentholder.top.label;"
+						accesskey="&contentholder.top.accesskey;"
+						radiogroup="contentHolder-position"
+						type="radio"/>
+					<xul:menuitem id="contentHolder-position-bottom"
+						label="&contentholder.bottom.label;"
+						accesskey="&contentholder.bottom.accesskey;"
+						radiogroup="contentHolder-position"
+						type="radio"/>
+					<xul:menuitem id="contentHolder-position-left"
+						label="&contentholder.left.label;"
+						accesskey="&contentholder.left.accesskey;"
+						radiogroup="contentHolder-position"
+						type="radio"/>
+					<xul:menuitem id="contentHolder-position-right"
+						label="&contentholder.right.label;"
+						accesskey="&contentholder.right.accesskey;"
+						radiogroup="contentHolder-position"
+						type="radio"/>
+				</xul:menupopup>
+			</xul:menu>
+			<xul:menuitem id="contentHolder-buttonsShowHide"
+				type="checkbox"
+				checked="true"
+				label="&contentholder.buttonsShowHide.label;"
+				accesskey="&contentholder.buttonsShowHide.accesskey;"
+				oncommand="gAppContent.contentHolderButtonsShowHide();"/>
+			<xul:menuitem id="contentHolder-buttonsSmall"
+				type="checkbox"
+				checked="true"
+				label="&contentholder.buttonsSmall.label;"
+				accesskey="&contentholder.buttonsSmall.accesskey;"
+				oncommand="gAppContent.contentHolderButtonsSmall();"/>
+			<xul:menuseparator/>
+			<xul:menuitem
+				label="&contentholder.about.label;"
+				oncommand="window.openDialog('chrome://contentholder/content/about.xul', '_blank', 'chrome,dialog,modal,centerscreen');"/>
+		</xul:menupopup>
+		<xul:menupopup id="contentHolder-stock-shortcut"
+			style="max-width:28em"
+			oncommand="gAppContent.contentHolderLoad(event.originalTarget.value);"
+			onpopupshowing="gAppContent.contentHolderInitStockMenu(this); event.stopPropagation();"
+			onpopuphiding="event.stopPropagation();">
+			<xul:menu class="stock-full"
+				label="&contentholder.stock_full.label;"
+				accesskey="&contentholder.stock_full.accesskey;">
+				<xul:menupopup class="stock-full-popup"
+					onpopupshowing="event.stopPropagation();"
+					onpopuphiding="event.stopPropagation();"/>
+			</xul:menu>
+			<xul:menuseparator class="stock-sep"/>
+			<xul:menuitem class="stock-add"
+				label="&contentholder.stock_add.label;"
+				accesskey="&contentholder.stock_add.accesskey;"
+				oncommand="gAppContent.contentHolderStockCurrent(); event.stopPropagation();"/>
+			<xul:menuseparator/>
+			<xul:menu class="stock-delete"
+				label="&contentholder.stock_delete.label;"
+				accesskey="&contentholder.stock_delete.accesskey;">
+				<xul:menupopup class="stock-delete-popup"
+					style="max-width:28em"
+					oncommand="gAppContent.contentHolderRemoveStock(event.originalTarget.value); event.stopPropagation();"
+					onpopupshowing="event.stopPropagation();"
+					onpopuphiding="event.stopPropagation();"/>
+			</xul:menu>
+			<xul:menuitem class="stock-deleteAll"
+				label="&contentholder.stock_deleteAll.label;"
+				accesskey="&contentholder.stock_deleteAll.accesskey;"
+				oncommand="gAppContent.contentHolderRemoveAllStocks(); event.stopPropagation();"/>
+		</xul:menupopup>
+		<xul:stringbundle src="chrome://contentholder/locale/contentholder.properties"/>
+	</content>
+
+	<implementation>
+		<field name="mIsLoaded">
+			false
+		</field>
+		<field name="mShowNormalContextMenu">
+			false
+		</field>
+		<field name="mMouseDownX">
+			0
+		</field>
+		<field name="mMouseDownY">
+			0
+		</field>
+		<field name="mStringBundle">
+			null
+		</field>
+
+		<field name="mPrefs">
+			Components.classes['@mozilla.org/preferences;1'].getService(Components.interfaces.nsIPrefBranch)
+		</field>
+		<field name="mPromptService">
+			Components.classes['@mozilla.org/embedcomp/prompt-service;1'].getService(Components.interfaces.nsIPromptService)
+		</field>
+		<property name="knsISupportsString" readonly="true"
+			onget="return ('nsISupportsWString' in Components.interfaces) ? Components.interfaces.nsISupportsWString : Components.interfaces.nsISupportsString ;"/>
+
+		<method name="getPref">
+			<parameter name="aPrefstring"/>
+			<body><![CDATA[
+				try {
+					var type = this.mPrefs.getPrefType(aPrefstring);
+					switch (type)
+					{
+						case this.mPrefs.PREF_STRING:
+							return this.mPrefs.getComplexValue(aPrefstring, this.knsISupportsString).data;
+							break;
+						case this.mPrefs.PREF_INT:
+							return this.mPrefs.getIntPref(aPrefstring);
+							break;
+						default:
+							return this.mPrefs.getBoolPref(aPrefstring);
+							break;
+					}
+				}
+				catch(e) {
+				}
+				return null;
+			]]></body>
+		</method>
+		<method name="setPref">
+			<parameter name="aPrefstring"/>
+			<parameter name="aNewValue"/>
+			<body><![CDATA[
+				var type;
+				try {
+					type = typeof aNewValue;
+				}
+				catch(e) {
+					type = null;
+				}
+
+				switch (type)
+				{
+					case 'string':
+						var string = ('@mozilla.org/supports-wstring;1' in Components.classes) ?
+								Components.classes['@mozilla.org/supports-wstring;1'].createInstance(this.knsISupportsString) :
+								Components.classes['@mozilla.org/supports-string;1'].createInstance(this.knsISupportsString) ;
+						string.data = aNewValue;
+						this.mPrefs.setComplexValue(aPrefstring, this.knsISupportsString, string);
+						break;
+					case 'number':
+						this.mPrefs.setIntPref(aPrefstring, parseInt(aNewValue));
+						break;
+					default:
+						this.mPrefs.setBoolPref(aPrefstring, aNewValue);
+						break;
+				}
+				return true;
+			]]></body>
+		</method>
+		<method name="clearPref">
+			<parameter name="aPrefstring"/>
+			<body><![CDATA[
+				try {
+					this.mPrefs.clearUserPref(aPrefstring);
+				}
+				catch(e) {
+				}
+			]]></body>
+		</method>
+
+		<method name="setOrRemoveBooleanAttribute">
+			<parameter name="aNode"/>
+			<parameter name="aAttr"/>
+			<parameter name="aValue"/>
+			<body><![CDATA[
+			if (!aNode || !aAttr) return;
+			if (aValue)
+				aNode.setAttribute(aAttr, true);
+			else
+				aNode.removeAttribute(aAttr);
+			]]></body>
+		</method>
+
+
+		<property name="contentHolderContainerBox" readonly="true"
+			onget="return document.getAnonymousNodes(this)[0];"/>
+		<property name="mainContentBox" readonly="true"
+			onget="return document.getElementById('mainContentBox');"/>
+		<property name="contentHolderSplitter" readonly="true"
+			onget="return document.getElementById('contentHolder-splitter');"/>
+		<property name="contentHolderBox" readonly="true"
+			onget="return document.getElementById('contentHolderBox');"/>
+		<property name="contentHolderInnerBox" readonly="true"
+			onget="return document.getElementById('contentHolderInnerBox');"/>
+		<property name="contentHolder" readonly="true"
+			onget="return document.getElementById('contentHolder');"/>
+
+		<property name="isContentHolderShown" readonly="true">
+			<getter><![CDATA[
+				if (this.contentHolderBox.collapsed) return false;
+
+				if (this.contentHolderContainerBox.orient == 'horizontal')
+					return this.contentHolderBox.width > 0 ? true : false ;
+				else
+					return this.contentHolderBox.height > 0 ? true : false ;
+			]]></getter>
+		</property>
+
+		<method name="contentHolderShow">
+			<body><![CDATA[
+				this.contentHolderBox.collapsed = false;
+				this.contentHolderSplitter.removeAttribute('state');
+
+				if (this.contentHolderContainerBox.orient == 'horizontal') {
+					if (this.contentHolderBox.width == 0)
+						this.contentHolderBox.width = this.getPref('contentholder.holder.width') || this.getPref('contentholder.holder.openWidth') || parseInt(this.mainContentBox.width/2);
+				}
+				else {
+					if (this.contentHolderBox.height == 0)
+						this.contentHolderBox.height = this.getPref('contentholder.holder.height') || this.getPref('contentholder.holder.openHeight') || parseInt(this.mainContentBox.height/2);
+				}
+
+				window.setTimeout('gAppContent.contentHolderInitContent();', 0);
+			]]></body>
+		</method>
+
+		<method name="contentHolderHide">
+			<body><![CDATA[
+				this.contentHolderBox.collapsed = true;
+				this.contentHolderSplitter.setAttribute('state', 'collapsed');
+			]]></body>
+		</method>
+
+		<method name="contentHolderShowHide">
+			<body><![CDATA[
+				if (this.isContentHolderShown)
+					this.contentHolderHide();
+				else
+					this.contentHolderShow();
+			]]></body>
+		</method>
+
+
+		<method name="contentHolderInit">
+			<body><![CDATA[
+				var box = gAppContent;
+
+				// initialize history
+				try {
+					var history = box.contentHolder.sessionHistory;
+				}
+				catch(e) {
+					try {
+						box.contentHolder.webNavigation.sessionHistory = Components.classes['@mozilla.org/browser/shistory;1'].createInstance(Components.interfaces.nsISHistory);
+						box.contentHolder.docShell.QueryInterface(Components.interfaces.nsIDocShellHistory).globalHistory = Components.classes['@mozilla.org/browser/global-history;1'].getService(Components.interfaces.nsIGlobalHistory);;
+					}
+					catch(ex) {
+					}
+
+					if (box.contentHolder.securityUI &&
+						box.contentHolder.contentDocument)
+						box.contentHolder.securityUI.init(box.contentHolder.contentWindow);
+				}
+
+				box.contentHolderPosition = box.getPref('contentholder.position') || 'bottom';
+
+				if (box.getPref('contentholder.holder.collapsed'))
+					box.contentHolderHide();
+				else
+					box.contentHolderShow();
+
+				if (box.getPref('contentholder.splitter.hideButtons'))
+					box.contentHolderButtonsShowHide();
+				if (box.getPref('contentholder.splitter.smallButtons'))
+					box.contentHolderButtonsSmall();
+
+				box.contentHolderBox.height = box.getPref('contentholder.holder.height');
+				box.contentHolderBox.width  = box.getPref('contentholder.holder.width');
+				box.mainContentBox.height   = box.getPref('contentholder.content.height');
+				box.mainContentBox.width    = box.getPref('contentholder.content.width');
+
+				document.getElementById('contentAreaContextMenu').addEventListener('popupshowing', box.contentHolderInitContextMenu, false);
+
+				var count = box.getPref('contentholder.stock.count') || 0;
+				for (var i = 0; i < count; i++)
+				{
+					box.contentHolderStockedPages[box.contentHolderStockedPages.length] = {
+						title : box.getPref('contentholder.stock.page'+i+'.title'),
+						uri   : box.getPref('contentholder.stock.page'+i+'.uri')
+					}
+				}
+
+				box.mStringBundle = document.getAnonymousNodes(box)[3];
+			]]></body>
+		</method>
+
+		<method name="contentHolderInitContent">
+			<body><![CDATA[
+				var box = gAppContent;
+
+				if (box.mIsLoaded) {
+					if (!box.contentHolderBox.collapsed) {
+						box.contentHolder.docShell
+							.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+							.getInterface(Components.interfaces.nsIWebNavigation)
+							.QueryInterface(Components.interfaces.nsIDocShellTreeItem)
+							.QueryInterface(Components.interfaces.nsIDocShell)
+							.QueryInterface(Components.interfaces.nsIBaseWindow)
+							.repaint(true);
+					}
+					return;
+				}
+
+				if (!box.contentHolderBox.collapsed) {
+					var uri = box.getPref('contentholder.holder.lastVisited');
+					if (uri) box.contentHolder.loadURI(uri);
+					box.mIsLoaded = true;
+				}
+			]]></body>
+		</method>
+
+		<method name="contentHolderShutdown">
+			<body><![CDATA[
+				var box = gAppContent;
+				box.contentHolderSaveState();
+
+//				var holder = box.contentHolder;
+//				if (holder.currentURI && holder.currentURI.spec)
+//					box.setPref('contentholder.holder.lastVisited', holder.currentURI.spec);
+
+				var menu = document.getElementById('contentAreaContextMenu');
+				menu.removeEventListener('popupshowing', box.contentHolderInitContextMenu, false);
+
+				window.removeEventListener('unload', box.contentHolderShutdown, false);
+			]]></body>
+		</method>
+
+		<method name="contentHolderSaveState">
+			<body><![CDATA[
+				this.setPref('contentholder.holder.collapsed', this.contentHolderBox.collapsed);
+
+				this.setPref('contentholder.holder.width', Number(this.contentHolderBox.width || 0));
+				this.setPref('contentholder.holder.height', Number(this.contentHolderBox.height || 0));
+
+				if (this.contentHolderBox.width > 0)
+					this.setPref('contentholder.holder.openWidth', Number(this.contentHolderBox.width));
+				if (this.contentHolderBox.height > 0)
+					this.setPref('contentholder.holder.openHeight', Number(this.contentHolderBox.height));
+
+				this.setPref('contentholder.content.width', Number(this.mainContentBox.width || 0));
+				this.setPref('contentholder.content.height', Number(this.mainContentBox.height || 0));
+			]]></body>
+		</method>
+
+		<method name="contentHolderInitContextMenu">
+			<parameter name="aEvent"/>
+			<body><![CDATA[
+				var menu = aEvent.target;
+				var box  = gAppContent;
+				var i;
+
+				if (menu.id != 'contentAreaContextMenu') return;
+
+				var contextWindow = box.getWindowFromDocument(document.popupNode.ownerDocument, box.contentHolder.docShell);
+				var inContentHolder = !contextWindow || ((new XPCNativeWrapper(contextWindow, 'top')).top != gBrowser.contentWindow) ;
+
+				var hiddenItems = menu.getElementsByAttribute('contentHolderItem', 'true');
+				for (i = 0; i < hiddenItems.length; i++)
+					hiddenItems[i].hidden = inContentHolder;
+
+				// popup normal context menu
+				if (!inContentHolder || box.mShowNormalContextMenu) return;
+
+				// popup content holder context menu instead of the normal
+				aEvent.preventDefault();
+
+				var commands = [
+						'undo', 'redo', 'cut', 'copy', 'paste', 'delete', 'selectAll'
+					];
+				for (i in commands)
+					document.getElementById('contentHolder-'+commands[i]).disabled = document.getElementById('cmd_'+commands[i]).disabled;
+
+				box.setOrRemoveBooleanAttribute(document.getElementById('contentHolder-goBack'), 'disabled', !box.contentHolder.canGoBack);
+				box.setOrRemoveBooleanAttribute(document.getElementById('contentHolder-goForward'), 'disabled', !box.contentHolder.canGoForward);
+				box.setOrRemoveBooleanAttribute(document.getElementById('contentHolder-stop'), 'disabled', box.contentHolder.docShell.busyFlags == box.contentHolder.docShell.BUSY_FLAGS_NONE);
+
+				box.contentHolderShowPopup('contentHolderContextMenu', box.mMouseDownX, box.mMouseDownY);
+			]]></body>
+		</method>
+		<method name="getWindowFromDocument">
+			<parameter name="aDocument"/>
+			<parameter name="aRootDocShell"/>
+			<body><![CDATA[
+				try {
+					var docWrapper = new XPCNativeWrapper(aDocument, 'defaultView');
+					if (docWrapper.defaultView)
+						return docWrapper.defaultView;
+				}
+				catch(e) {
+				}
+
+				var rootDocShell = aRootDocShell || window
+					.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+					.getInterface(Components.interfaces.nsIWebNavigation)
+					.QueryInterface(Components.interfaces.nsIDocShell);
+
+				const kDSTreeNode = Components.interfaces.nsIDocShellTreeNode;
+				const kDSTreeItem = Components.interfaces.nsIDocShellTreeItem;
+				const kWebNav     = Components.interfaces.nsIWebNavigation;
+
+				var rootDocShell = rootDocShell
+						.QueryInterface(kDSTreeNode)
+						.QueryInterface(kDSTreeItem)
+						.QueryInterface(kWebNav);
+				var docShell = rootDocShell;
+				traceDocShellTree:
+				do {
+					if (docShell.document == aDocument)
+						return docShell;
+
+					if (docShell.childCount) {
+						docShell = docShell.getChildAt(0);
+						docShell = docShell
+							.QueryInterface(kDSTreeNode)
+							.QueryInterface(kWebNav);
+					}
+					else {
+						parentDocShell = docShell.parent.QueryInterface(kDSTreeNode);
+						while (docShell.childOffset == parentDocShell.childCount-1)
+						{
+							docShell = parentDocShell;
+							if (docShell == rootDocShell || !docShell.parent)
+								break traceDocShellTree;
+							parentDocShell = docShell.parent.QueryInterface(kDSTreeNode);
+						}
+						docShell = parentDocShell.getChildAt(docShell.childOffset+1)
+							.QueryInterface(kDSTreeNode)
+							.QueryInterface(kWebNav);
+					}
+				} while (docShell != rootDocShell);
+
+				return null;
+			]]></body>
+		</method>
+
+		<method name="contentHolderInitStockMenu">
+			<parameter name="aPopup"/>
+			<body><![CDATA[
+				var full      = aPopup.getElementsByAttribute('class', 'stock-full')[0],
+					fullPopup = aPopup.getElementsByAttribute('class', 'stock-full-popup')[0],
+					sep       = aPopup.getElementsByAttribute('class', 'stock-sep')[0],
+					del       = aPopup.getElementsByAttribute('class', 'stock-delete')[0],
+					delPopup  = aPopup.getElementsByAttribute('class', 'stock-delete-popup')[0],
+					delAll    = aPopup.getElementsByAttribute('class', 'stock-deleteAll')[0];
+
+				var range = document.createRange();
+
+				range.selectNodeContents(aPopup);
+				range.deleteContents();
+
+				range.selectNodeContents(fullPopup);
+				range.deleteContents();
+
+				range.selectNodeContents(delPopup);
+				range.deleteContents();
+
+				range.detach();
+
+				var item,
+					count = 0,
+					data  = this.contentHolderStockedPages;
+				for (var i = 0; i < data.length; i++)
+				{
+					item = document.createElement('menuitem');
+					item.setAttribute('label', this.contentHolderStockedPages[i].title);
+					item.setAttribute('value', this.contentHolderStockedPages[i].uri);
+					item.setAttribute('crop', 'center');
+					item.setAttribute('stockIndex',        i);
+					item.setAttribute('contentHolderItem', true);
+
+					if (count > data.length-11) {
+						item.setAttribute('label', [data.length-count-1, item.getAttribute('label')].join(' : '));
+						item.setAttribute('accesskey', data.length-count-1);
+					}
+
+					if (count) {
+						fullPopup.insertBefore(item, fullPopup.firstChild);
+						delPopup.insertBefore(item.cloneNode(true), delPopup.firstChild);
+					}
+					else {
+						fullPopup.appendChild(item);
+						delPopup.appendChild(item.cloneNode(true));
+					}
+
+					if (count > data.length-11)
+						item = aPopup.insertBefore(item.cloneNode(true), aPopup.firstChild);
+
+					count++;
+				}
+
+				if (delPopup.hasChildNodes()) {
+					sep.removeAttribute('hidden');
+					del.removeAttribute('disabled');
+					delAll.removeAttribute('disabled');
+				}
+				else {
+					sep.setAttribute('hidden', true);
+					del.setAttribute('disabled', true);
+					delAll.setAttribute('disabled', true);
+				}
+
+				if (fullPopup.hasChildNodes() &&
+					fullPopup.childNodes.length > aPopup.childNodes.length-6)
+					full.removeAttribute('hidden');
+				else
+					full.setAttribute('hidden', true);
+			]]></body>
+		</method>
+		<field name="contentHolderStockedPages">
+			new Array()
+		</field>
+
+		<property name="contentHolderPosition">
+			<getter><![CDATA[
+				return this.mContentHolderPosition;
+			]]></getter>
+			<setter><![CDATA[
+				if (!val ||
+					typeof val != 'string' ||
+					!val.match(/^(top|bottom|left|right)$/))
+					val = 'bottom';
+
+				var orient = (val == 'left' || val == 'right') ? 'horizontal' : 'vertical' ;
+
+				this.contentHolderContainerBox.orient        = orient;
+				this.mainContentBox.orient                   = orient;
+				this.contentHolderBox.orient                 = orient;
+				this.contentHolderSplitter.orient            = orient;
+				this.contentHolderSplitter.firstChild.orient = orient;
+				this.contentHolderInnerBox.orient            = orient == 'vertical' ? 'horizontal' : 'vertical' ;
+
+				if (val == 'left' || val == 'top') {
+					this.mainContentBox.ordinal        = 2;
+					this.contentHolderSplitter.ordinal = 1;
+					this.contentHolderBox.ordinal      = 0;
+					this.contentHolderSplitter.setAttribute('collapse', 'before');
+				}
+				else {
+					this.mainContentBox.ordinal        = 0;
+					this.contentHolderSplitter.ordinal = 1;
+					this.contentHolderBox.ordinal      = 2;
+					this.contentHolderSplitter.setAttribute('collapse', 'after');
+				}
+
+				this.mContentHolderPosition = val || 'bottom' ;
+				this.setPref('contentholder.position', this.mContentHolderPosition);
+				this.setAttribute('contentHolderPosition', this.mContentHolderPosition);
+			]]></setter>
+		</property>
+		<field name="mContentHolderPosition">
+			null
+		</field>
+
+
+		<method name="contentHolderLoad">
+			<parameter name="aURI"/>
+			<body><![CDATA[
+				var uri = aURI || gBrowser.currentURI.spec;
+
+				this.contentHolderShow();
+
+				this.contentHolder.loadURI(uri);
+				this.setPref('contentholder.holder.lastVisited', uri);
+			]]></body>
+		</method>
+
+		<method name="contentHolderBrowserLoad">
+			<parameter name="aURI"/>
+			<parameter name="aOpenInTab"/>
+			<body><![CDATA[
+				var uri = aURI || this.mIsLoaded ? this.contentHolder.currentURI.spec : this.getPref('contentholder.holder.lastVisited');
+				if (aOpenInTab)
+					gBrowser.selectedTab = gBrowser.addTab(uri);
+				else
+					gBrowser.loadURI(uri);
+
+				this.contentHolderHide();
+			]]></body>
+		</method>
+
+		<method name="contentHolderGoBack">
+			<body><![CDATA[
+				if (this.contentHolder.canGoBack) {
+					this.contentHolder.goBack();
+				}
+			]]></body>
+		</method>
+		<method name="contentHolderGoForward">
+			<body><![CDATA[
+				if (this.contentHolder.canGoForward) {
+					this.contentHolder.goForward();
+				}
+			]]></body>
+		</method>
+		<method name="contentHolderReload">
+			<body><![CDATA[
+				this.contentHolder.reload();
+			]]></body>
+		</method>
+		<method name="contentHolderStop">
+			<body><![CDATA[
+				this.contentHolder.stop();
+			]]></body>
+		</method>
+		<method name="contentHolderOpenURL">
+			<body><![CDATA[
+				var uri = prompt(this.mStringBundle.getString('open_url'), 'http://');
+				if (uri) this.contentHolder.loadURI(uri);
+			]]></body>
+		</method>
+
+		<method name="contentHolderButtonsShowHide">
+			<body><![CDATA[
+				var item = document.getElementById('contentHolder-buttonsShowHide');
+				if (this.getAttribute('contentHolderHideButtons')) {
+					item.setAttribute('checked', true);
+					this.removeAttribute('contentHolderHideButtons');
+					this.clearPref('contentholder.splitter.hideButtons');
+				}
+				else {
+					item.removeAttribute('checked');
+					this.setAttribute('contentHolderHideButtons', true);
+					this.setPref('contentholder.splitter.hideButtons', true);
+				}
+			]]></body>
+		</method>
+
+		<method name="contentHolderButtonsSmall">
+			<body><![CDATA[
+				var item = document.getElementById('contentHolder-buttonsSmall');
+				if (this.getAttribute('contentHolderSmallButtons')) {
+					item.removeAttribute('checked');
+					this.removeAttribute('contentHolderSmallButtons');
+					this.clearPref('contentholder.splitter.smallButtons');
+				}
+				else {
+					item.setAttribute('checked', true);
+					this.setAttribute('contentHolderSmallButtons', true);
+					this.setPref('contentholder.splitter.smallButtons', true);
+				}
+			]]></body>
+		</method>
+
+
+
+		<method name="contentHolderStockCurrent">
+			<body><![CDATA[
+				var browser = this.contentHolder;
+				var uri     = this.mIsLoaded ? browser.currentURI.spec : this.getPref('contentholder.holder.lastVisited') ;
+				var title = browser.contentDocument && 'title' in browser.contentDocument ? (new XPCNativeWrapper(browser.contentDocument, 'title')).title : null ;
+				if (!title)
+					title = uri;
+
+				this.contentHolderStockedPages[this.contentHolderStockedPages.length] = {
+					title : title,
+					uri   : uri
+				}
+				this.contentHolderSaveStockedPages();
+			]]></body>
+		</method>
+
+		<method name="contentHolderRemoveStock">
+			<parameter name="aIndex"/>
+			<body><![CDATA[
+				this.contentHolderStockedPages.splice(aIndex, 1);
+				this.contentHolderSaveStockedPages();
+			]]></body>
+		</method>
+
+		<method name="contentHolderRemoveAllStocks">
+			<body><![CDATA[
+				if (!this.mPromptService.confirm(
+						window,
+						this.mStringBundle.getString('stock_deleteAll_confirm_title'),
+						this.mStringBundle.getString('stock_deleteAll_confirm_text')
+					))
+					return;
+
+				this.contentHolderStockedPages = [];
+				this.contentHolderSaveStockedPages();
+			]]></body>
+		</method>
+
+		<method name="contentHolderSaveStockedPages">
+			<body><![CDATA[
+				var i;
+				var data     = this.contentHolderStockedPages;
+				var oldCount = this.getPref('contentholder.stock.count') || 0;
+				var newCount = data.length;
+
+				if (oldCount > newCount) {
+					for (i = newCount; i < oldCount; i++)
+					{
+						this.clearPref('contentholder.stock.page'+i+'.title');
+						this.clearPref('contentholder.stock.page'+i+'.uri');
+					}
+				}
+
+				for (i = 0; i < newCount; i++)
+				{
+					this.setPref('contentholder.stock.page'+i+'.title', data[i].title);
+					this.setPref('contentholder.stock.page'+i+'.uri', data[i].uri);
+				}
+
+				this.setPref('contentholder.stock.count', newCount);
+			]]></body>
+		</method>
+
+		<method name="contentHolderShowPopup">
+			<parameter name="aID"/>
+			<parameter name="aX"/>
+			<parameter name="aY"/>
+			<body><![CDATA[
+				var node = document.getElementById(aID);
+				if (!node) return;
+
+				var x = (aX === void(0) ? window.screenX+20 : aX ),
+					y = (aY === void(0) ? window.screenY+40 : aY );
+
+				node.autoPosition = true;
+				node.showPopup(node.parentNode, x, y, 'menupopup', null, null);
+			]]></body>
+		</method>
+
+		<method name="contentHolderOnCollapseOrExpand">
+			<body><![CDATA[
+				if (this.contentHolderSplitter.getAttribute('state') == 'collapsed') {
+					if (
+						(this.mContentHolderPosition == 'top' ||
+						this.mContentHolderPosition == 'bottom') &&
+						this.contentHolderBox.height == 0
+						) {
+						this.contentHolderBox.height = this.getPref('contentholder.holder.openHeight');
+					}
+					else if (
+						(this.mContentHolderPosition == 'left' ||
+						this.mContentHolderPosition == 'right') &&
+						this.contentHolderBox.width == 0
+						) {
+						this.contentHolderBox.width = this.getPref('contentholder.holder.openWidth');
+					}
+				}
+				window.setTimeout('gAppContent.contentHolderInitContent();', 0);
+			]]></body>
+		</method>
+
+	</implementation>
+
+	<handlers>
+		<handler event="mousedown"><![CDATA[
+			this.mShowNormalContextMenu = (event.type == 'mousedown' && event.button == 2) ? (event.shiftKey) : false ;
+			this.mMouseDownX = event.clientX;
+			this.mMouseDownY = event.clientY;
+		]]></handler>
+	</handlers>
+</binding>
+
+</bindings>

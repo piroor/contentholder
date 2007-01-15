@@ -1,0 +1,166 @@
+/* ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1/GPL 2.0/LGPL 2.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is the Content Holder.
+ *
+ * The Initial Developer of the Original Code is SHIMODA Hiroshi.
+ * Portions created by the Initial Developer are Copyright (C) 2003
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s): SHIMODA Hiroshi <piro@p.club.ne.jp>
+ *
+ * Alternatively, the contents of this file may be used under the terms of
+ * either the GNU General Public License Version 2 or later (the "GPL"), or
+ * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+ * in which case the provisions of the GPL or the LGPL are applicable instead
+ * of those above. If you wish to allow use of your version of this file only
+ * under the terms of either the GPL or the LGPL, and not to allow others to
+ * use your version of this file under the terms of the MPL, indicate your
+ * decision by deleting the provisions above and replace them with the notice
+ * and other provisions required by the GPL or the LGPL. If you do not delete
+ * the provisions above, a recipient may use your version of this file under
+ * the terms of any one of the MPL, the GPL or the LGPL.
+ *
+ * ***** END LICENSE BLOCK ***** */
+
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+#appcontent
+{
+	-moz-binding: url("./contentholder.xml#contentHolder") !important;
+}
+
+.contentHolderSplitterButton,
+.contentHolderSplitterButton[disabled="true"]
+{
+	min-width: 0;
+	min-height: 0;
+	margin: 0;
+	padding: 0;
+	cursor: auto;
+	width: auto !important;
+}
+
+[contentHolderHideButtons="true"] .contentHolderSplitterButton,
+[state="collapsed"] .contentHolderSplitterButton.takeOut,
+[state="collapsed"] .contentHolderSplitterButton.navigations
+{
+	display: none;
+}
+
+.contentHolderSplitterButton[disabled="true"]
+{
+	-moz-opacity: 0.4;
+}
+
+[contentHolderPosition="left"] .contentHolderSplitterButton.takeIn,
+[contentHolderPosition="right"] .contentHolderSplitterButton.takeOut
+{
+	list-style-image: url(./res/large/left-gray.png);
+}
+[contentHolderSmallButtons="true"][contentHolderPosition="left"] .contentHolderSplitterButton.takeIn,
+[contentHolderSmallButtons="true"][contentHolderPosition="right"] .contentHolderSplitterButton.takeOut
+{
+	list-style-image: url(./res/small/left-gray.png);
+}
+
+[contentHolderPosition="left"] .contentHolderSplitterButton.takeOut,
+[contentHolderPosition="right"] .contentHolderSplitterButton.takeIn
+{
+	list-style-image: url(./res/large/right-gray.png);
+}
+[contentHolderSmallButtons="true"][contentHolderPosition="left"] .contentHolderSplitterButton.takeOut,
+[contentHolderSmallButtons="true"][contentHolderPosition="right"] .contentHolderSplitterButton.takeIn
+{
+	list-style-image: url(./res/small/right-gray.png);
+}
+
+[contentHolderPosition="top"] .contentHolderSplitterButton.takeIn,
+[contentHolderPosition="bottom"] .contentHolderSplitterButton.takeOut
+{
+	list-style-image: url(./res/large/up-gray.png);
+}
+[contentHolderSmallButtons="true"][contentHolderPosition="top"] .contentHolderSplitterButton.takeIn,
+[contentHolderSmallButtons="true"][contentHolderPosition="bottom"] .contentHolderSplitterButton.takeOut
+{
+	list-style-image: url(./res/small/up-gray.png);
+}
+
+[contentHolderPosition="top"] .contentHolderSplitterButton.takeOut,
+[contentHolderPosition="bottom"] .contentHolderSplitterButton.takeIn
+{
+	list-style-image: url(./res/large/down-gray.png);
+}
+[contentHolderSmallButtons="true"][contentHolderPosition="top"] .contentHolderSplitterButton.takeOut,
+[contentHolderSmallButtons="true"][contentHolderPosition="bottom"] .contentHolderSplitterButton.takeIn
+{
+	list-style-image: url(./res/small/down-gray.png);
+}
+
+.contentHolderSplitterButton.goBack
+{
+	list-style-image: url(./res/large/back.png);
+}
+[contentHolderSmallButtons="true"] .contentHolderSplitterButton.goBack
+{
+	list-style-image: url(./res/small/back.png);
+}
+
+.contentHolderSplitterButton.goForward
+{
+	list-style-image: url(./res/large/forward.png);
+}
+[contentHolderSmallButtons="true"] .contentHolderSplitterButton.goForward
+{
+	list-style-image: url(./res/small/forward.png);
+}
+
+.contentHolderSplitterButton.reload
+{
+	list-style-image: url(./res/large/reload.png);
+}
+[contentHolderSmallButtons="true"] .contentHolderSplitterButton.reload
+{
+	list-style-image: url(./res/small/reload.png);
+}
+
+.contentHolderSplitterButton.stop
+{
+	list-style-image: url(./res/large/stop.png);
+}
+[contentHolderSmallButtons="true"] .contentHolderSplitterButton.stop
+{
+	list-style-image: url(./res/small/stop.png);
+}
+
+[contentHolderPosition="left"] .contentHolderSplitterButton.goURL,
+[contentHolderPosition="right"] .contentHolderSplitterButton.goURL
+{
+	list-style-image: url(./res/large/url-horizontal.png);
+}
+[contentHolderSmallButtons="true"][contentHolderPosition="left"] .contentHolderSplitterButton.goURL,
+[contentHolderSmallButtons="true"][contentHolderPosition="right"] .contentHolderSplitterButton.goURL
+{
+	list-style-image: url(./res/small/url-horizontal.png);
+}
+
+[contentHolderPosition="top"] .contentHolderSplitterButton.goURL,
+[contentHolderPosition="bottom"] .contentHolderSplitterButton.goURL
+{
+	list-style-image: url(./res/large/url-vertical.png);
+}
+[contentHolderSmallButtons="true"][contentHolderPosition="top"] .contentHolderSplitterButton.goURL,
+[contentHolderSmallButtons="true"][contentHolderPosition="bottom"] .contentHolderSplitterButton.goURL
+{
+	list-style-image: url(./res/small/url-vertical.png);
+}
